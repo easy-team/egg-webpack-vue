@@ -20,9 +20,7 @@
 [download-image]: https://img.shields.io/npm/dm/egg-webpack-vue.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-webpack-vue
 
-<!--
-Description here.
--->
+egg webpack building solution for vue
 
 ## Install
 
@@ -34,7 +32,7 @@ $ npm i egg-webpack-vue --save
 
 ```js
 // {app_root}/config/plugin.js
-exports.webpack-vue = {
+exports.webpackvue = {
   enable: true,
   package: 'egg-webpack-vue',
 };
@@ -44,7 +42,26 @@ exports.webpack-vue = {
 
 ```js
 // {app_root}/config/config.default.js
-exports.webpack-vue = {
+exports.webpackvue = {
+  baseDir, // project root dir
+  build: {
+    port: 8090, // webpack-hot-middleware port
+    path: 'public', // webpack compile result dir, support absolution path
+    publicPath: '/public/', // router prefix
+    prefix: 'static', // webpack static resource prefix
+    entry: [path.join(baseDir, 'app/web/page')], // webpack entry dir
+    commonsChunk: ['vendor'] // webpack.optimize.CommonsChunkPlugin
+  },
+  webpack: {
+    styleLoader: 'vue-style-loader', // file process loader, default style-loader
+    extractCss: true, // false: css inline html , otherwise extract style in css file
+    loaderOption: {  // loader custom option or query
+      sass: {
+        includePaths: [path.join(baseDir, 'app/web/asset/style')] // sass @import search dir
+      }
+    },
+    pluginOption: {} // plugin custom option
+  }
 };
 ```
 
@@ -52,11 +69,126 @@ see [config/config.default.js](config/config.default.js) for more detail.
 
 ## Example
 
-<!-- example here -->
+- webpack vue common config `config.js`
+
+```js
+const path = require('path');
+exports.getOption = config => {
+  return {
+    entry: {
+      vendor: ['vue']
+    },
+    resolve: {
+      alias: {
+        asset: path.join(config.baseDir, 'app/web/asset'),
+        app: path.join(config.baseDir, 'app/web/framework/vue/app'),
+        component: path.join(config.baseDir, 'app/web/component'),
+        framework: path.join(config.baseDir, 'app/web/framework'),
+        store: path.join(config.baseDir, 'app/web/store')
+      }
+    }
+  };
+};
+````
+
+- webpack vue client build config `build/client.js`
+
+```js
+const EggWebpackVue = require('egg-webpack-vue');
+const baseConfig = require('./config');
+class ClientBuilder extends EggWebpackVue.WebpackClientBuilder {
+  constructor(config, options) {
+    super(config, options);
+    this.setOption(baseConfig.getOption(config));
+    if (!this.prod) {
+      this.setOption({
+        output: {
+          publicPath: EggWebpackVue.EasyWebpack.Utils.getDevPublicPath(config, 2)
+        },
+        devtool: 'eval-source-map',
+        performance: {
+          hints: false
+        }
+      });
+    }
+  }
+}
+module.exports = new ClientBuilder(exports.webpackvue).create();
+```
+
+- webpack vue server build config `build/server.js`
+
+```js
+const path = require('path');
+const fs = require('fs');
+const EggWebpackVue = require('egg-webpack-vue');
+const StringReplacePlugin = require('string-replace-webpack-plugin');
+const webpackConfig = require('../config/webpackConfig');
+const baseConfig = require('./config');
+class ServerBuilder extends EggWebpackVue.WebpackServerBuilder {
+  constructor(config, options) {
+    super(config, options);
+    this.setOption(baseConfig.getOption(config));
+    this.setLoader({
+      test: /layout\/standard\/index\.js$/,
+      loader: StringReplacePlugin.replace({
+        replacements: [
+          {
+            pattern: /["|'](.*\.html)\?inline["|']/gi,
+            replacement(match, p1, offset, string) {
+              const filePath = path.join(config.baseDir, p1);
+              const content = fs.readFileSync(filePath, 'utf8').replace(/'/g, '"').replace(/[\r\n]/g, '');
+              return "'" + content + "'";
+            }
+          }
+        ]
+      })
+    }, true);
+    this.setPlugin(new StringReplacePlugin(), true);
+  }
+}
+module.exports = new ServerBuilder(exports.webpackvue).create();
+
+```
+
+- command config `build/build.js`
+
+```js
+const EggWebpackVue = require('egg-webpack-vue');
+const clientConfig = require('./client');
+const serverConfig = require('./server');
+EggWebpackVue.EasyWebpack.build([clientConfig, serverConfig]);
+```
+
+
+- command run `package.json`
+
+```js
+"scripts": {
+  "build": "NODE_ENV=development node build/build.js",
+  "build-prod": "NODE_ENV=production node build/build.js",
+  "start": "NODE_ENV=development node index.js",
+  "start-prod": "NODE_ENV=production node index.js"
+}
+```
+
+```bash
+npm run build or npm run build-prod
+```
+
+- with [egg-webpack](https://github.com/hubcarl/egg-webpack), While developing, while compiling
+
+```js
+exports.webpack = {
+  port: 8090,
+  clientConfig: require(path.join(app.baseDir, 'build/client.js')),
+  serverConfig: require(path.join(app.baseDir, 'build/server.js')),
+};
+```
 
 ## Questions & Suggestions
 
-Please open an issue [here](https://github.com/eggjs/egg/issues).
+Please open an issue [here](https://github.com/hubcarl/egg-webpack).
 
 ## License
 

@@ -1,7 +1,8 @@
 'use strict';
-const webpack = require('webpack');
-const merge = require('webpack-merge');
 const EasyWebpack = require('easywebpack');
+const webpack = EasyWebpack.webpack;
+const merge = EasyWebpack.merge;
+
 exports.getLoader = config => {
   return [
     {
