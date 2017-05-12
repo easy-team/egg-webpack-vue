@@ -54,7 +54,6 @@ exports.webpackvue = {
   },
   webpack: {
     styleLoader: 'vue-style-loader', // file process loader, default style-loader
-    extractCss: true, // false: css inline html , otherwise extract style in css file
     loaderOption: {  // loader custom option or query
       sass: {
         includePaths: [path.join(baseDir, 'app/web/asset/style')] // sass @import search dir

@@ -16,7 +16,6 @@ module.exports = app => {
     },
     webpack: {
       styleLoader: 'vue-style-loader',
-      extractCss: true,
       loaderOption: {
         sass: {
           includePaths: [path.join(app.baseDir, 'app/web/asset/style')]
