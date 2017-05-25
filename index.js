@@ -4,3 +4,4 @@ exports.WebpackClientBuilder = require('./lib/client');
 exports.WebpackServerBuilder = require('./lib/server');
 exports.webpack = exports.EasyWebpack.webpack;
 exports.merge = exports.EasyWebpack.merge;
+exports.build = exports.EasyWebpack.build;
