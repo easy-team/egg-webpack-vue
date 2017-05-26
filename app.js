@@ -1,6 +1,6 @@
 'use strict';
 const path = require('path');
-const fs = require('fs');
+const EasyWebpack = require('easywebpack');
 module.exports = app => {
   console.log('app.config.env =', app.config.env);
   if (app.view) {
@@ -24,7 +24,7 @@ module.exports = app => {
       const filepath = app.config.webpackvue.build.manifest;
       const promise = app.webpack.fileSystem.readClientFile(filepath);
       promise.then(content => {
-        fs.writeFileSync(filepath, content, 'utf8');
+        EasyWebpack.Utils.saveManifestFile(filepath, content);
       });
     }
   });
