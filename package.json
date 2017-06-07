@@ -1,6 +1,6 @@
 {
   "name": "egg-webpack-vue",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "egg webpack building solution for vue",
   "eggPlugin": {
     "name": "webpackvue",
@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "autoprefixer": "^6.7.7",
-    "easywebpack": "~0.2.0",
+    "easywebpack": "^0.2.2",
     "vue-html-loader": "^1.2.4",
     "vue-loader": "^11.3.4",
     "vue-style-loader": "^3.0.1",
