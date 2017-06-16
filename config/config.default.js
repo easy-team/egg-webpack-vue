@@ -1,12 +1,9 @@
 'use strict';
-const EasyWebpack = require('easywebpack');
-const merge = EasyWebpack.merge;
-const defaultWebpackConfig = require('../lib/config');
+const path = require('path');
 module.exports = app => {
   const config = {};
-  config.webpackvue = EasyWebpack.getConfig(merge({
-    baseDir: app.baseDir
-  }, defaultWebpackConfig));
-
+  config.webpackvue = {
+    manifest: path.join(app.baseDir, 'config/manifest.json'),
+  };
   return config;
 };

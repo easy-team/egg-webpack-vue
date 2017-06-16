@@ -1,8 +1,8 @@
 'use strict';
 const path = require('path');
-const EasyWebpack = require('easywebpack');
+const co = require('co');
+const Manifest = require('webpack-manifest-normalize');
 module.exports = app => {
-  console.log('app.config.env =', app.config.env);
   if (app.view) {
     app.view.resolve = function* (name) {
       return name;
@@ -10,21 +10,25 @@ module.exports = app => {
   }
 
   if (app.vue) {
-    app.vue.readFile = fileName => {
-      const filePath = path.isAbsolute(fileName) ? fileName : path.join(app.config.view.root[0], fileName);
-      if (/\.html$/.test(fileName)) {
-        return app.webpack.fileSystem.readClientFile(filePath, fileName);
-      }
-      return app.webpack.fileSystem.readServerFile(filePath, fileName);
+    const renderBundle = app.vue.renderBundle;
+    app.vue.renderBundle = (name, context, options) => {
+      const filePath = path.isAbsolute(name) ? name : path.join(app.config.view.root[0], name);
+      const promise = app.webpack.fileSystem.readWebpackMemoryFile(filePath, name);
+      return co(function* () {
+        const content = yield promise;
+        return renderBundle.bind(app.vue)(content, context, options);
+      });
     };
   }
 
-  app.messenger.on(app.webpack.Constant.EVENT_WEBPACK_CLIENT_BUILD_STATE, data => {
+  app.messenger.on(app.webpack.Constant.EVENT_WEBPACK_BUILD_STATE, data => {
     if (data.state) {
-      const filepath = app.config.webpackvue.build.manifest;
-      const promise = app.webpack.fileSystem.readClientFile(filepath);
+      const filepath = app.config.webpackvue.manifest;
+      const promise = app.webpack.fileSystem.readWebpackMemoryFile(filepath);
       promise.then(content => {
-        EasyWebpack.Utils.saveManifestFile(filepath, content);
+        if (content) {
+          Manifest.saveFile(filepath, content);
+        }
       });
     }
   });
