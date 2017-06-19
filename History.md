@@ -2,7 +2,7 @@
 0.4.0 / 2017-06-19
 ==================
 
-  * refactor:seperate easywebpack
+  * refactor:seperate easywebpack, only local vue development function
 
 0.3.0 / 2017-06-09
 ==================
