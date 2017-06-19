@@ -20,7 +20,7 @@
 [download-image]: https://img.shields.io/npm/dm/egg-webpack-vue.svg?style=flat-square
 [download-url]: https://npmjs.org/package/egg-webpack-vue
 
-support vue server rendering file memory read for egg-webpack and egg-view-vue. when the local development, wepback memory read the way to cover the local file read logic.
+support vue server rendering file memory read for [egg-webpack](https://github.com/hubcarl/egg-webpack) and [egg-view-vue](https://github.com/eggjs/egg-view-vue). when the local development, wepback memory read the way to cover the local file read logic.
 
 ## Install
 
@@ -40,16 +40,8 @@ exports.webpackvue = {
 
 ## Configuration
 
-```js
-// {app_root}/config/config.default.js
-exports.webpackvue = {
-  baseDir, // project root dir
-};
-```
-
 see [config/config.default.js](config/config.default.js) for more detail.
 
-## Example
 
 ## Questions & Suggestions
 
