@@ -1,4 +1,9 @@
 
+0.4.1 / 2017-07-05
+==================
+
+  * feat:send manifest save success event for dev mode
+
 0.4.0 / 2017-06-19
 ==================
 
