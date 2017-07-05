@@ -28,6 +28,7 @@ module.exports = app => {
       promise.then(content => {
         if (content) {
           Manifest.saveFile(filepath, content);
+          app.messenger.sendToApp('webpack_manifest_save_success', { state: true });
         }
       });
     }
