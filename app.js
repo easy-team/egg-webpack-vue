@@ -16,6 +16,9 @@ module.exports = app => {
       const promise = app.webpack.fileSystem.readWebpackMemoryFile(filePath, name);
       return co(function* () {
         const content = yield promise;
+        if (!content) {
+          throw new Error(`read webpack memory file[${filePath}] content is empty, please check if the file exists`);
+        }
         return renderBundle.bind(app.vue)(content, context, options);
       });
     };
