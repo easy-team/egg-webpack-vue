@@ -1,9 +1,8 @@
 'use strict';
 const path = require('path');
-const co = require('co');
 module.exports = app => {
   if (app.view) {
-    app.view.resolve = function* (name) {
+    app.view.resolve = async function (name) {
       return name;
     };
   }
@@ -11,16 +10,13 @@ module.exports = app => {
   if (app.vue) {
     const render = app.vue.render;
     app.vue.bundleCache = false;
-    app.vue.render = (name, context, options) => {
+    app.vue.render = async (name, context, options) => {
       const filePath = path.isAbsolute(name) ? name : path.join(app.config.view.root[0], name);
-      const promise = app.webpack.fileSystem.readWebpackMemoryFile(filePath, name);
-      return co(function* () {
-        const content = yield promise;
-        if (!content) {
-          throw new Error(`read webpack memory file[${filePath}] content is empty, please check if the file exists`);
-        }
-        return render.bind(app.vue)(content, context, options);
-      });
+      const content = await app.webpack.fileSystem.readWebpackMemoryFile(filePath, name);
+      if (!content) {
+        return Promise.reject(new Error(`read webpack memory file[${filePath}] content is empty, please check if the file exists`));
+      }
+      return render.bind(app.vue)(content, context, options);
     };
   }
 };
