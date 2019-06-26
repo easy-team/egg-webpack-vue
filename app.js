@@ -3,7 +3,7 @@ const path = require('path');
 const co = require('co');
 module.exports = app => {
   if (app.view) {
-    app.view.resolve = function (name) {
+    app.view.resolve = function(name) {
       return Promise.resolve(name);
     };
   }
